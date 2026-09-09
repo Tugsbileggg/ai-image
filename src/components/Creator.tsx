@@ -3,9 +3,6 @@
 import Image from "next/image";
 import { TabsContent } from "./ui/tabs";
 import { useRef, useState } from "react";
-import { InferenceClient } from "@huggingface/inference";
-
-const client = new InferenceClient(process.env.NEXT_PUBLIC_HF_TOKEN);
 
 export const Creator = () => {
   const [prompt, setPrompt] = useState("");
@@ -32,16 +29,13 @@ export const Creator = () => {
       setLoading(true);
       setImageUrl("");
 
-      const dataUrl = await client.textToImage(
-        {
-          provider: "fal-ai",
-          model: "black-forest-labs/FLUX.1-dev",
-          inputs: prompt,
-        },
-        {
-          outputType: "dataUrl",
-        },
-      );
+      const res = await fetch("/api/image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const { dataUrl } = await res.json();
 
       if (requestId !== requestIdRef.current) return;
 

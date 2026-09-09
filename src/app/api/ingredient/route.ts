@@ -5,24 +5,23 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
-
-    // Түүхийг Gemini-ийн формат руу хөрвүүлнэ
-    const contents = messages.map((m: { role: string; text: string }) => ({
-      role: m.role === "user" ? "user" : "model",
-      parts: [{ text: m.text }],
-    }));
+    const { prompt } = await req.json();
 
     const response = await ai.models.generateContent({
       model: "gemini-3.5-flash",
-      contents,
+      contents: `Hereglegch zuwhun hoolnii neriig oruulahad tuhain hoolond oroh ortsuudiig gargaj ir
+
+Food description:
+${prompt}
+
+Return the answer as markdown bullet points.`,
     });
 
-    return NextResponse.json({ text: response.text });
+    return NextResponse.json({ text: response.text ?? "" });
   } catch (error) {
     console.error("Gemini error:", error);
     return NextResponse.json(
-      { error: "AI хариулт авахад алдаа гарлаа" },
+      { error: "Орц тодорхойлоход алдаа гарлаа" },
       { status: 500 },
     );
   }

@@ -1,13 +1,8 @@
 import Image from "next/image";
 import { TabsContent } from "./ui/tabs";
-import { GoogleGenAI } from "@google/genai";
 import Markdown from "react-markdown";
 import { useState } from "react";
 import { ImageIcon } from "lucide-react";
-
-const client = new GoogleGenAI({
-  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-});
 
 export const Ingredient = () => {
   const [prompt, setPrompt] = useState("");
@@ -20,15 +15,13 @@ export const Ingredient = () => {
     try {
       setLoading(true);
 
-      const result = await client.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: `Hereglegch zuwhun hoolnii neriig oruulahad tuhain hoolond oroh ortsuudiig gargaj ir
-
-Food description:
-${prompt}
-
-Return the answer as markdown bullet points.`,
+      const res = await fetch("/api/ingredient", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
       });
+
+      const result = await res.json();
 
       setResponse(result.text ?? "");
     } catch (error) {

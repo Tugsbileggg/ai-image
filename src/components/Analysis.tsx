@@ -1,12 +1,7 @@
 import Image from "next/image";
 import { TabsContent } from "./ui/tabs";
 import { useRef, useState } from "react";
-import { GoogleGenAI } from "@google/genai";
 import Markdown from "react-markdown";
-
-const client = new GoogleGenAI({
-  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-});
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -49,35 +44,13 @@ export const Analysis = () => {
     try {
       const base64 = await fileToBase64(image);
 
-      const interaction = await client.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: [
-          {
-            inlineData: {
-              mimeType: image.type,
-              data: base64,
-            },
-          },
-          {
-            text: `Analyze this food image.
-
-Return the result in Markdown:
-
-# Food name
-
-## Ingredients
-- Ingredients 1
-- Ingredients 2
-
-### Estimated nutrition
-- Calories
-- Protein
-- Carbs
-- Fat
-`,
-          },
-        ],
+      const res = await fetch("/api/analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mimeType: image.type, data: base64 }),
       });
+
+      const interaction = await res.json();
 
       setResponse(interaction.text ?? "");
     } catch (error) {

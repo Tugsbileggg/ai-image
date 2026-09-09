@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { GoogleGenAI } from "@google/genai";
 import { MessageCircle, Send, X } from "lucide-react";
 
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
@@ -16,10 +15,6 @@ type MessageType = {
   message: string;
   role: "USER" | "AI";
 };
-
-const client = new GoogleGenAI({
-  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-});
 
 export const Messagecontent = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -39,10 +34,17 @@ export const Messagecontent = () => {
     setInput("");
     setIsTyping(true);
 
-    const ai = await client.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Give me a short answer to this: ${input}`,
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: [
+          { role: "user", text: `Give me a short answer to this: ${input}` },
+        ],
+      }),
     });
+
+    const ai = await res.json();
 
     setMessages((prev) => [
       ...prev,
