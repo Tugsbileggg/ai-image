@@ -50,7 +50,7 @@ export const Analysis = () => {
       const base64 = await fileToBase64(image);
 
       const interaction = await client.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.5-flash",
         contents: [
           {
             inlineData: {

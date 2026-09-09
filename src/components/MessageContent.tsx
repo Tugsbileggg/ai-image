@@ -40,7 +40,7 @@ export const Messagecontent = () => {
     setIsTyping(true);
 
     const ai = await client.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash",
       contents: `Give me a short answer to this: ${input}`,
     });
 
