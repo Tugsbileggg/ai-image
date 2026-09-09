@@ -52,6 +52,11 @@ export const Analysis = () => {
 
       const interaction = await res.json();
 
+      if (!res.ok) {
+        setResponse(`⚠️ ${interaction.error ?? "Алдаа гарлаа"}`);
+        return;
+      }
+
       setResponse(interaction.text ?? "");
     } catch (error) {
       console.log(error);

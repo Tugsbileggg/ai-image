@@ -8,6 +8,7 @@ export const Creator = () => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
+  const [error, setError] = useState("");
 
   const requestIdRef = useRef(0);
 
@@ -16,6 +17,7 @@ export const Creator = () => {
 
     setPrompt("");
     setImageUrl("");
+    setError("");
     setLoading(false);
   };
 
@@ -28,6 +30,7 @@ export const Creator = () => {
     try {
       setLoading(true);
       setImageUrl("");
+      setError("");
 
       const res = await fetch("/api/image", {
         method: "POST",
@@ -35,11 +38,16 @@ export const Creator = () => {
         body: JSON.stringify({ prompt }),
       });
 
-      const { dataUrl } = await res.json();
+      const data = await res.json();
 
       if (requestId !== requestIdRef.current) return;
 
-      setImageUrl(dataUrl);
+      if (!res.ok) {
+        setError(data.error ?? "Алдаа гарлаа");
+        return;
+      }
+
+      setImageUrl(data.dataUrl);
     } catch (error) {
       console.log("Image generate error:", error);
     } finally {
@@ -112,7 +120,9 @@ export const Creator = () => {
           <p className="text-sm text-zinc-500">Generating image...</p>
         )}
 
-        {!loading && !imageUrl && (
+        {!loading && error && <p className="text-sm text-red-600">⚠️ {error}</p>}
+
+        {!loading && !imageUrl && !error && (
           <p className="text-sm text-zinc-500">
             First, enter a food name to generate an image.
           </p>

@@ -23,6 +23,11 @@ export const Ingredient = () => {
 
       const result = await res.json();
 
+      if (!res.ok) {
+        setResponse(`⚠️ ${result.error ?? "Алдаа гарлаа"}`);
+        return;
+      }
+
       setResponse(result.text ?? "");
     } catch (error) {
       console.log(error);

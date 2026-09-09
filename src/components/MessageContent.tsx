@@ -50,7 +50,7 @@ export const Messagecontent = () => {
       ...prev,
       {
         role: "AI",
-        message: ai.text!,
+        message: res.ok ? ai.text! : `⚠️ ${ai.error ?? "Алдаа гарлаа"}`,
       },
     ]);
 
